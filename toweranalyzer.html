@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>Battle Factory RNG Web</title>
+<style>
+body {
+    font-family: sans-serif;
+    margin: 20px;
+}
+input, select {
+    margin: 5px 0;
+    padding: 5px;
+}
+textarea {
+    width: 100%;
+    height: 300px;
+    margin-top: 10px;
+}
+button {
+    padding: 10px 20px;
+    margin-top: 10px;
+}
+</style>
+</head>
+<body>
+
+<h2>Battle Factory RNG（DP/Pt）Web版</h2>
+
+<div>
+    <label>日替わりseed：</label><br>
+    <input id="seed" type="text" value="12345678"><br>
+
+    <label>現在何週目か（1〜8）：</label><br>
+    <input id="round" type="number" value="1"><br>
+
+    <label>本日の何回目の挑戦か：</label><br>
+    <input id="count" type="number" value="1"><br>
+
+    <label>使用ポケモン1：</label><br>
+    <input id="player1" type="text"><br>
+
+    <label>使用ポケモン2：</label><br>
+    <input id="player2" type="text"><br>
+
+    <label>使用アイテム1：</label><br>
+    <input id="item1" type="text"><br>
+
+    <label>使用アイテム2：</label><br>
+    <input id="item2" type="text"><br>
+
+    <button onclick="runRNG()">実行</button>
+</div>
+
+<h3>結果</h3>
+<textarea id="output"></textarea>
+
+<script src="main.js"></script>
+<script>
+let Module = {};
+
+async function loadText(path) {
+    return await fetch(path).then(r => r.text());
+}
+
+async function runRNG() {
+    const seed = document.getElementById("seed").value;
+    const round = parseInt(document.getElementById("round").value);
+    const count = parseInt(document.getElementById("count").value);
+    const player1 = document.getElementById("player1").value;
+    const player2 = document.getElementById("player2").value;
+    const item1 = document.getElementById("item1").value;
+    const item2 = document.getElementById("item2").value;
+
+    // 外部ファイル読み込み
+    const trainerTxt = await loadText("data/trainer.txt");
+    const usedataTxt = await loadText("data/tower-trainers-table.txt");
+    const factoryTxt = await loadText("data/factory_data.txt");
+    const pokedexTxt = await loadText("data/pokedex.csv");
+
+    // C++ run() 呼び出し
+    const result = Module.ccall(
+        "run",
+        "string",
+        ["string","number","number","string","string","string","string","string","string","string","string"],
+        [seed, round, count, player1, player2, item1, item2,
+         trainerTxt, usedataTxt, factoryTxt, pokedexTxt]
+    );
+
+    document.getElementById("output").value = result;
+}
+
+// Emscripten ロード
+Module = {
+    onRuntimeInitialized() {
+        console.log("WASM ready");
+    }
+};
+</script>
+
+</body>
+</html>
