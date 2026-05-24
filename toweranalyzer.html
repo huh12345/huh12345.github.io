@@ -57,7 +57,11 @@ button {
 
 <script src="main.js"></script>
 <script>
-let Module = {};
+let Module = {
+    onRuntimeInitialized() {
+        console.log("WASM ready");
+    }
+};
 
 async function loadText(path) {
     return await fetch(path).then(r => r.text());
@@ -78,24 +82,16 @@ async function runRNG() {
     const factoryTxt = await loadText("data/factory_data.txt");
     const pokedexTxt = await loadText("data/pokedex.csv");
 
-    // C++ run() 呼び出し
-    const result = Module.ccall(
-        "run",
-        "string",
-        ["string","number","number","string","string","string","string","string","string","string","string"],
-        [seed, round, count, player1, player2, item1, item2,
-         trainerTxt, usedataTxt, factoryTxt, pokedexTxt]
+    // ★ 最新 Emscripten 仕様：wasmExports.run() を直接呼ぶ
+    const result = Module.wasmExports.run(
+        seed, round, count,
+        player1, player2,
+        item1, item2,
+        trainerTxt, usedataTxt, factoryTxt, pokedexTxt
     );
 
     document.getElementById("output").value = result;
 }
-
-// Emscripten ロード
-Module = {
-    onRuntimeInitialized() {
-        console.log("WASM ready");
-    }
-};
 </script>
 
 </body>
