@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>※テスト中</title>
+<script src="main.js"></script>
+
+<style>
+body {
+    font-family: system-ui, sans-serif;
+    margin: 20px;
+    background: #f7f7f7;
+    color: #333;
+}
+
+h2 {
+    margin-bottom: 15px;
+    font-size: 1.6rem;
+    font-weight: 600;
+}
+
+.form-section {
+    background: #fff;
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px #0001;
+    margin-bottom: 20px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 10px 15px;
+    align-items: center;
+}
+
+.form-grid label {
+    font-size: 0.9rem;
+}
+
+input[type="text"] {
+    padding: 6px 8px;
+    font-size: 0.9rem;
+    width: 180px;
+}
+
+input[type="submit"] {
+    padding: 8px 20px;
+    font-size: 1rem;
+    border: none;
+    background: #0078d4;
+    color: #fff;
+    border-radius: 5px;
+    cursor: pointer;
+}
+input[type="submit"]:hover {
+    background: #005fa3;
+}
+
+/* 結果表示 */
+#result table {
+    table-layout: fixed;
+    width: 100%;
+    background: #fff;
+}
+
+#result table colgroup col:nth-child(1) { width: 40px; }   /* ID */
+#result table colgroup col:nth-child(2) { width: 100px; }  /* 名前 */
+#result table colgroup col:nth-child(3) { width: 140px; }   /* アイテム */
+#result table colgroup col:nth-child(4) { width: 120px; }   /* 特性 */
+#result table colgroup col:nth-child(5) { width: 40px; }   /* 性別 */
+#result table colgroup col:nth-child(6) { width: auto; }   /* 技 */
+
+#result td, #result th {
+    word-wrap: break-word;
+}
+#result th {
+    background: #f0f0f0;
+    font-weight: 600;
+}
+
+#result td.status {
+    font-size: 0.85rem;
+    color: #555;
+}
+
+/* スマホ対応 */
+@media (max-width: 600px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    input[type="text"] {
+        width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<h2>DP用ツール※テスト中</h2>
+<small>以下サイトを参考にさせていただきました。この場を借りてお礼を申し上げます。</small><br>
+<small>トレーナー情報および使用するポケモンの情報：　ポケモンの友 https://pokebook.jp/</small><br>
+<small>バトルタワーの選出および日替わり乱数のロジックの情報：　oupoの日記 http://d.hatena.ne.jp/oupo/　　バトルタワー スカウター http://oupo.github.io/tools/tower-scouter.html</small><br>
+<br>
+<small>調べ切れていない部分があることやツール自体の動作が十分に確認できていないため、出力結果の保証はできません。ご了承ください。</small><br>
+
+<form name="f" onsubmit="return false;">
+
+<div class="form-section">
+    <div class="form-grid">
+
+        <label>周目</label>
+        <div>
+            <input type="text" name="round" size="3" value="1">
+            <label><input type="radio" name="rule" value="single" checked> シングル</label>
+            <label><input type="radio" name="rule" value="double"> ダブル</label>
+            <label><input type="radio" name="rule" value="npc"> NPCマルチ</label>
+            <label><input type="radio" name="rule" value="connect"> 通信マルチ</label>
+        </div>
+
+        <label>連続したくじ番号</label>
+        <div>
+            <input type="text" name="kujiids" size="25">
+            <small>（半角スペース or カンマ区切り）</small>
+        </div>
+
+        <label>くじ番号検索</label>
+        <div>
+            <label><input type="checkbox" name="search_check"> 上の番号を基準に</label>
+            <input type="text" name="days_range_min" size="2" value="1"> ～
+            <input type="text" name="days_range_max" size="2" value="50"> 日後  
+            今日のくじ番号：
+            <input type="text" name="today_kuji" size="7">
+            <br>＋ <input type="text" name="days" size="2" value="0"> 日経過
+        </div>
+
+        <label>カウント</label>
+        <div>
+            <input type="text" name="count" size="3" value="1"> 回
+            <small>（1周目挑戦前に+1／日付跨ぎで0リセット）</small>
+        </div>
+
+        <label>使用ポケモン1</label>
+        <div>
+            <input type="text" name="pokemon1" size="25">
+            <small>NPCマルチ用　ポリゴン属はポリゴン２、ポリゴンＺで入力する。</small>
+        </div>
+
+        <label>使用ポケモン2</label>
+        <div>
+            <input type="text" name="pokemon2" size="25">
+            <small>NPCマルチ用</small>
+        </div>
+
+        <label>使用アイテム1</label>
+        <div>
+            <input type="text" name="item1" size="25">
+            <small>NPCマルチ用　アイテムはきあいのタスキなどゲーム内と同じ表記で入力する。</small>
+        </div>
+
+        <label>使用アイテム2</label>
+        <div>
+            <input type="text" name="item2" size="25">
+            <small>NPCマルチ用</small>
+        </div>
+
+    </div>
+
+    <div style="margin-top: 15px;">
+        <input type="submit" name="seed_submit" value="決定">
+    </div>
+</div>
+
+</form>
+
+<div id="higawari-seed-select"></div>
+<div id="result"></div>
+
+</body>
+</html>
