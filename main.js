@@ -249,7 +249,7 @@ function show_result0(seed, round) {
     let sideTrainerEntries = [];
 
     if (rule === "npc") {
-        prng.rand();
+        if (round === 1) prng.rand();
         for (let i = 0; i < 5; i++) {
             const entries = pickEntries(prng, i + 300, entrynum, sideTrainerEntries);
             const tid = prng.rand32();
